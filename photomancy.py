@@ -21,19 +21,26 @@ def get_rgb_noise(width, height):
     img = Image.merge('RGB', bands)
     return img
 
-def blur(img):
-    """Replace each non-border pixel with the average of its neighbors and return as a new image"""
+def for_each_cell(func, img, cell_radius=1):
+    """Call a function on groups of pixels in the source image and return a transformed image"""
     width = img.width
     height = img.height
     img2 = Image.new('RGB', (width, height))
     draw = ImageDraw.Draw(img2)
-    for y in range(1, height-1):
-        for x in range(1, width-1):
-            neighbors = [img.getpixel((x_offs, y_offs)) for x_offs in (x-1, x, x+1) for y_offs in (y-1, y, y+1)]
-            avg_color = [math.floor(sum(p[i] for p in neighbors)/len(neighbors)) for i in (0, 1, 2)]
-            avg_color = tuple(avg_color)
-            draw.point((x,y), avg_color)
+    for y in range(cell_radius, height-cell_radius):
+        for x in range(cell_radius, width-cell_radius):
+            neighbors = [img.getpixel((x_offs, y_offs)) for x_offs in range(x-cell_radius, x+cell_radius+1) for y_offs in range(y-cell_radius, y+cell_radius+1)]
+            func(img, draw, x, y, neighbors)
     return img2
+
+def blur(img):
+    """Replace each non-border pixel with the average of its neighbors and return as a new image"""
+    def blur_func(img, draw, x, y, neighbors):
+        avg_color = [math.floor(sum(p[i] for p in neighbors)/len(neighbors)) for i in (0, 1, 2)]
+        avg_color = tuple(avg_color)
+        draw.point((x,y), avg_color)
+
+    return for_each_cell(blur_func, img)
 
 if __name__ == "__main__":
     width = 800
