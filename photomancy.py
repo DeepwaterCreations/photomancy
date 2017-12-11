@@ -44,6 +44,9 @@ def blur(img):
 def get_avg_color(neighbors):
     return tuple([math.floor(sum(p[i] for p in neighbors)/len(neighbors)) for i in (0, 1, 2)])
 
+def get_avg_value(neighbors):
+    return math.floor(sum(neighbors)/len(neighbors))
+
 def rgb_push_func(img, draw, x, y, neighbors):
     orig_color = img.getpixel((x, y))
     avg_color = get_avg_color(neighbors)
@@ -52,6 +55,14 @@ def rgb_push_func(img, draw, x, y, neighbors):
     combined_color = tuple(min(255, v[0] + v[1]) for v in zip(orig_color, pushed_color))
     # combined_color = orig_color + pushed_color
     draw.point((x,y), combined_color)
+
+def bw_push_func(img, draw, x, y, neighbors):
+    orig_value = img.getpixel((x, y))
+    avg_value = get_avg_value(neighbors)
+    # pushed_value = 32 if avg_value > 127 else -32
+    # combined_value = min(max(avg_value + pushed_value, 0), 255)
+    pushed_value = 255 if avg_value > 127 else 0
+    draw.point((x, y), pushed_value)
 
 def filter_color(color):
     if all([not(0 < v < 255) for v in color]):
