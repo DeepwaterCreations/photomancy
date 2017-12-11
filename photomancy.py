@@ -25,7 +25,7 @@ def for_each_cell(func, img, cell_radius=1):
     """Call a function on groups of pixels in the source image and return a transformed image"""
     width = img.width
     height = img.height
-    img2 = Image.new('RGB', (width, height))
+    img2 = Image.new(img.mode, (width, height))
     draw = ImageDraw.Draw(img2)
     for y in range(cell_radius, height-cell_radius):
         for x in range(cell_radius, width-cell_radius):
