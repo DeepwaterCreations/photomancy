@@ -68,3 +68,5 @@ if __name__ == "__main__":
         img = for_each_cell(lambda img, draw, x, y, neighbors: draw.point((x, y), filter_color(img.getpixel((x, y)))), img, cell_radius=0)
         # img = blur(img)
     img.show()
+
+    img.save("output.png")
